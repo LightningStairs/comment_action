@@ -1,8 +1,24 @@
 # Container image that runs your code
-FROM alpine:3.10
+FROM ruby:3.0.0-alpine
 
-# Copies your code file from your action repository to the filesystem path `/` of the container
-COPY entrypoint.sh /entrypoint.sh
+LABEL maintainer="lightningstairs <jenah.blitz@gmail.com>"
 
-# Code file to execute when the docker container starts up (`entrypoint.sh`)
-ENTRYPOINT ["/entrypoint.sh"]
+RUN gem install bundler
+
+RUN mkdir -p /runner/action
+
+WORKDIR /runner/action
+
+COPY Gemfile* ./
+
+RUN bundle install --retry 3
+
+COPY lib ./lib
+
+COPY run.rb ./
+
+ENV BUNDLE_GEMFILE /runner/action/Gemfile
+
+RUN chmod +x /runner/action/run.rb
+
+CMD ["ruby", "/runner/action/run.rb"]
