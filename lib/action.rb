@@ -6,7 +6,7 @@ class Action
 
   def initialize(config)
     @client = config.client
-    payload = config.payload
+    payload = config.event_payload
     @repo = payload['repository']['full_name']
     @comment_id = payload['comment']['id']
   end
